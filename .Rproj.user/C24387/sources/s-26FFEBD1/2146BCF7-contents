@@ -1,0 +1,154 @@
+library(Rcpp)
+## ------------------------------------------------------------------------
+Rayleigh<-function(sigma)
+{ U<-runif(10000)
+X<-1:10000
+for(i in 1:10000){
+  X[i]<-sqrt((-2*(sigma)^2)*log(1-U[i]))}
+X
+}  
+checkfunc<-function(sigma){
+  x<-Rayleigh(sigma)
+  t=1/(sigma*sqrt(exp(1)))
+  hist(x,prob=TRUE,main="check the pdf",ylim=c(0,t))
+  y<-seq(0,5,.01)
+  lines(y,y*exp(-y^2/(2*sigma^2))/(sigma)^2)
+}
+## ------------------------------------------------------------------------
+normalmix<-function(p){
+  U<-runif(1000)
+  X<-1:1000
+  for(i in 1:1000){
+    X[i]=(U[i]<=p)*rnorm(n=1,mean=0,sd=1)+(U[i]>p)*rnorm(n=1,mean=3,sd=1)
+  }
+  X
+}
+refunc<-function(p){
+  x<-normalmix(p)
+  cat("The head of sample for p1=",p,"is:",head(x),"\n")
+  hist(x,prob=TRUE,ylim=c(0,0.8))
+  y<-seq(-10,10,0.01)
+  lines(y,p*dnorm(x=y,mean=0,sd=1)+(1-p)*dnorm(x=y,mean=3,sd=1))
+}
+## ------------------------------------------------------------------------
+wishart<-function(n) #n:sample size
+{
+  arr<-array(1:(9*n),dim=c(3,3,n))  #save the T
+  matrix<-array(1:(9*n),dim=c(3,3,n))  #save the LAL^T
+  t<-rnorm(3*n) #tij:i>j
+  s1<-rchisq(n,df=5)
+  s2<-rchisq(n,df=4)
+  s3<-rchisq(n,df=3)
+  t1<-sqrt(s1) #t11
+  t2<-sqrt(s2) #t22
+  t3<-sqrt(s3) #t33
+  S<-matrix(c(1,0.5,0.5,0.5,1,0.5,0.5,0.5,1),ncol=3)
+  l<-chol(S)  #matrix l is a upper triangular,t(l) is what we need
+  for(i in 1:n){
+    arr[,,i]<-matrix(c(t1[i],t[3*i-2],t[3*i-1],0,t2[i],t[3*i],0,0,t3[i]),ncol=3)
+    matrix[,,i]<-t(l)%*%arr[,,i]%*%t(arr[,,i])%*%l
+  }
+  matrix
+}
+## ------------------------------------------------------------------------
+sk <- function(x) {
+  #computes the sample skewness coeff.
+  xbar <- mean(x)
+  m3 <- mean((x - xbar)^3)
+  m2 <- mean((x - xbar)^2)
+  return( m3 / m2^1.5 )
+}
+## ------------------------------------------------------------------------
+di<-function(x,y){
+  plot(scor[,x],scor[,y],xlab=colnames(scor)[x],ylab=colnames(scor)[y])
+}
+## ------------------------------------------------------------------------
+dCov <- function(x, y) {
+  x <- as.matrix(x)
+  y <- as.matrix(y)
+  n <- nrow(x)
+  m <- nrow(y)
+  if (n != m || n < 2) stop("Sample sizes must agree")
+  if (! (all(is.finite(c(x, y)))))
+    stop("Data contains missing or infinite values")
+  Akl <- function(x) {
+    d <- as.matrix(dist(x))
+    m <- rowMeans(d)
+    M <- mean(d)
+    a <- sweep(d, 1, m)
+    b <- sweep(a, 2, m)
+    return(b + M)
+  }
+  A <- Akl(x)
+  B <- Akl(y)
+  dCov <- sqrt(mean(A * B))
+  dCov
+}
+ndCov2 <- function(z, ix, dims) {
+  #dims contains dimensions of x and y 
+  p <- dims[1]
+  q <- dims[2]
+  d <- p + q
+  x <- z[ , 1:p] #leave x as is
+  y <- z[ix, -(1:p)] #permute rows of y 
+  return(nrow(z) * dCov(x, y)^2)
+}
+## ------------------------------------------------------------------------
+dl<-function(x){  ## pdf of standard Laplace
+  return(exp(-abs(x))/2)
+}
+rw.M<-function(sigma,N){   ## generate sample for different sigma
+  x0<-rnorm(1,mean=0,sd=sigma)
+  x<-numeric(N)
+  x[1]<-x0
+  u<-runif(N)
+  k<-0
+  for(i in 2:N){
+    y<-rnorm(1,mean=x[i-1],sd=sigma)
+    if(u[i]<=dl(y)/dl(x[i-1])) {
+      x[i]<-y
+      k<-k+1}
+    else x[i]<-x[i-1]
+  }
+  return(list(x=x,k=k))
+}
+## ------------------------------------------------------------------------
+iter<-function(p,q){
+  r<-1-p-q
+  a<-2*28*(p^2)/(p^2+2*p*r)+2*p*r/(p^2+2*p*r)*28+70
+  b<-2*24*(q^2)/(q^2+2*q*r)+2*q*r/(q^2+2*q*r)*24+70
+  c<-2*41+2*p*r/(p^2+2*p*r)*28+2*q*r/(q^2+2*q*r)*24
+  pnew<-a/(a+b+c)
+  qnew<-b/(a+b+c)
+  
+  return(c(pnew,qnew))
+}
+## ------------------------------------------------------------------------
+mcsapply<-function(x,f,n){
+  f<-match.fun(f)
+  answer <- mclapply(x,f,mc.cores=n)
+  if (USE.NAMES && is.character(x) && is.null(names(answer))) 
+    names(answer) <- x
+  if (!isFALSE(simplify) && length(answer)) 
+    simplify2array(answer, higher = (simplify == "array"))
+  else answer
+}
+## ------------------------------------------------------------------------
+cppFunction('List rw_Mc(double x0, double sigma, int N){
+NumericVector x(N);
+x[0]=x0;
+int k=0;
+for(int i=1;i<N;i++){
+
+double y=as<double>(rnorm(1,x[i-1], sigma));
+double u=as<double>(runif(1));
+
+if (u<=exp(-abs(y))/exp(-abs(x[i-1]))) {
+x[i]=y;
+k=k+1;  
+}
+else x[i]=x[i-1];
+}
+
+return(List::create(Named("x")=x,Named("k")=k));
+}')

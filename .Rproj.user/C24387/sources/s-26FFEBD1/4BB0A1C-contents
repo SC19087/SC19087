@@ -1,0 +1,146 @@
+---
+title: "Homework-12.13"
+author: "By 19087"
+date: "2019/12/18"
+output: html_document
+---
+
+## Page 204, exercise 3.  
+
+  Use both for loops and lapply() to fit linear models to the mtcars using the formulas stored in this list:  
+formulas <- list(  
+  mpg ~ disp,  
+  mpg ~ I(1 / disp),  
+  mpg ~ disp + wt,  
+  mpg ~ I(1 / disp) + wt
+)  
+
+---  
+
+## Answer 
+
+```{r}
+attach(mtcars)
+formulas <- list(  
+  mpg ~ disp,  
+  mpg ~ I(1/disp),  
+  mpg ~ disp + wt,  
+  mpg ~ I(1 / disp) + wt
+)
+
+lapply(formulas,lm,data=mtcars)
+for(i in 1:4){
+  print(lm(formulas[[i]],data=mtcars))
+}
+```  
+
+---  
+
+## Page 204, exercise 4.  
+
+  Fit the model mpg ~ disp to each of the bootstrap replicates of mtcars in the list below by using a for loop and lapply(). Can you do it without an anonymous function?   
+bootstraps <- lapply(1:10, function(i) {  
+rows <- sample(1:nrow(mtcars), rep = TRUE)  
+mtcars[rows, ]  
+})
+
+---  
+
+## Answer  
+
+```{r}
+bootstraps <- lapply(1:10, function(i) {  
+rows <- sample(1:nrow(mtcars), rep = TRUE)  
+mtcars[rows, ]  
+})
+lapply(bootstraps,lm,formula=mpg~disp)
+for(i in 1:10){
+  print(lm(mpg ~ disp, data = bootstraps[[i]]) )
+}
+```  
+
+---  
+
+
+## Page 204, exercise 5.  
+
+5. For each model in the previous two exercises, extract $R^2$ using the function below.  
+rsq <- function(mod) summary(mod)$r.squared
+
+
+---  
+
+## Answer  
+
+```{r}
+attach(mtcars)
+rsq <- function(mod) summary(mod)$r.squared
+formulas <- list(  
+  mpg ~ disp,  
+  mpg ~ I(1/disp),  
+  mpg ~ disp + wt,  
+  mpg ~ I(1 / disp) + wt
+)
+bootstraps <- lapply(1:10, function(i) {  
+rows <- sample(1:nrow(mtcars), rep = TRUE)  
+mtcars[rows, ]  
+})
+list1<-lapply(formulas,lm)
+list2<-lapply(bootstraps,lm,formula=mpg~disp)
+lapply(list1,rsq)
+lapply(list2,rsq)
+```
+
+---  
+
+## Page 214, exercise 3.  
+
+The following code simulates the performance of a t-test for non-normal data. Use sapply() and an anonymous function to extract the p-value from every trial.  
+trials <- replicate(100,  
+t.test(rpois(10, 10), rpois(7, 10)),  
+simplify = FALSE  
+)
+Extra challenge: get rid of the anonymous function by using [[ directly.  
+
+---  
+
+## Answer  
+
+```{r}
+trials <- replicate(
+100,
+t.test(rpois(10, 10), rpois(7, 10)),
+simplify = FALSE
+)
+sapply(trials, '[[', 3) 
+```  
+
+
+---  
+
+## Page 214, exercise 7.  
+
+Implement mcsapply(), a multicore version of sapply(). Can you implement mcvapply(), a parallel version of vapply()? Why or why not?  
+
+---  
+
+## Answer  
+
+
+For sapply, just replace 'lapply' in the function with 'mclapply'.  
+
+```{r}
+
+mcsapply<-function(x,f,n){
+    f<-match.fun(f)
+    answer <- mclapply(x,f,mc.cores=n)
+    if (USE.NAMES && is.character(x) && is.null(names(answer))) 
+        names(answer) <- x
+    if (!isFALSE(simplify) && length(answer)) 
+        simplify2array(answer, higher = (simplify == "array"))
+    else answer
+}
+```  
+
+For vapply, we cannot implement mcvapply. Because we have to test that the generated results are properly formatted or not. We don't know how to test them in mc-method. If we can generate the results and test them together in mc-method, then we can implement mcvapply.  
+

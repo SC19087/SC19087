@@ -1,0 +1,83 @@
+---
+title: "Homework-12.20"
+author: "By 19087"
+date: "2019/12/23"
+output: html_document
+---
+
+## Exercise  
+
+
+![](C:\Users\Administrator\Pictures\9.png)  
+
+---  
+
+## Answer  
+
+```{r}
+library(Rcpp)
+library(microbenchmark)
+##Rcpp method
+cppFunction('List rw_Mc(double x0, double sigma, int N){
+NumericVector x(N);
+x[0]=x0;
+int k=0;
+for(int i=1;i<N;i++){
+
+double y=as<double>(rnorm(1,x[i-1], sigma));
+double u=as<double>(runif(1));
+
+if (u<=exp(-abs(y))/exp(-abs(x[i-1]))) {
+x[i]=y;
+k=k+1;  
+}
+else x[i]=x[i-1];
+}
+
+return(List::create(Named("x")=x,Named("k")=k));
+}')
+## R method
+rw.M<-function(x0,sigma,N){   ## generate sample for different sigma
+  x<-numeric(N)
+  x[1]<-x0
+  u<-runif(N)
+  k<-0
+  for(i in 2:N){
+    y<-rnorm(1,mean=x[i-1],sd=sigma)
+    if(u[i]<=exp(-abs(y))/exp(-abs(x[i-1]))) {
+      x[i]<-y
+      k<-k+1}
+    else x[i]<-x[i-1]
+  }
+  return(list(x=x,k=k))
+}
+sigma<-c(0.05,0.5,2,16)
+x0<-25
+N<-2000
+rw1<-rw.M(x0,sigma[1],N)  ## four samples
+rw2<-rw.M(x0,sigma[2],N)
+rw3<-rw.M(x0,sigma[3],N)
+rw4<-rw.M(x0,sigma[4],N)
+rwC1<-rw_Mc(x0,sigma[1],N)  ## four samples
+rwC2<-rw_Mc(x0,sigma[2],N)
+rwC3<-rw_Mc(x0,sigma[3],N)
+rwC4<-rw_Mc(x0,sigma[4],N)
+par(mfrow=c(2,2))
+##comparison
+qqplot(rw1$x,rwC1$x)
+qqplot(rw2$x,rwC2$x)
+qqplot(rw3$x,rwC4$x)
+qqplot(rw4$x,rwC4$x)
+##computation time
+ts1<-microbenchmark(rw.M(x0,sigma[1],N),rw_Mc(x0,sigma[1],N))
+ts2<-microbenchmark(rw.M(x0,sigma[2],N),rw_Mc(x0,sigma[2],N))
+ts3<-microbenchmark(rw.M(x0,sigma[3],N),rw_Mc(x0,sigma[3],N))
+ts4<-microbenchmark(rw.M(x0,sigma[4],N),rw_Mc(x0,sigma[4],N))
+summary(ts1)[,c(1,3,5,6)]
+summary(ts2)[,c(1,3,5,6)]
+summary(ts3)[,c(1,3,5,6)]
+summary(ts4)[,c(1,3,5,6)]
+```  
+
+Hence, we found that Rcpp save much time. The qqplots showed that they are not totally the same, which may be due to the low number of Rcpp acceptances.  
+

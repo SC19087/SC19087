@@ -1,0 +1,41 @@
+[
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/gibbsC.cpp",
+                "kind" : 6,
+                "line" : 18,
+                "name" : "gibbsC(int, int)",
+                "parent_name" : "",
+                "usr" : "c:@F@gibbsC#I#I#"
+            }
+        ],
+        "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/gibbsC.cpp",
+        "file_last_write" : 1534279998
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 8,
+                "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/vaccC.cpp",
+                "kind" : 6,
+                "line" : 4,
+                "name" : "vacc3a(double, bool, bool)",
+                "parent_name" : "",
+                "usr" : "c:@F@vacc3a#d#b#b#"
+            },
+            {
+                "column" : 15,
+                "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/vaccC.cpp",
+                "kind" : 6,
+                "line" : 26,
+                "name" : "vaccC(NumericVector, LogicalVector, LogicalVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@vaccC#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI10#@N@Rcpp@CT>1#T@PreserveStorage#S1_#"
+            }
+        ],
+        "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/vaccC.cpp",
+        "file_last_write" : 1534279998
+    }
+]

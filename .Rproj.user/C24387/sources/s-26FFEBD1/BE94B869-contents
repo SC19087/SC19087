@@ -1,0 +1,105 @@
+---
+title: "Homework-11.1"
+author: 'By 19087'
+date: "2019/11/5"
+output: html_document
+---
+
+## Question 6.7  
+
+ Estimate the power of the skewness test of normality against symmetric Beta($\alpha,\alpha$) distributions and comment on the results. Are the results different for heavy-tailed symmetric alternatives such as t($\nu$)?  
+ 
+---  
+
+## Answer  
+
+```{r}
+sk <- function(x) {
+#computes the sample skewness coeff.
+xbar <- mean(x)
+m3 <- mean((x - xbar)^3)
+m2 <- mean((x - xbar)^2)
+return( m3 / m2^1.5 )
+}
+alpha<-0.1
+n<-30
+m<-2500
+cv<-qnorm(1-alpha/2,0,sqrt(6*(n-2)/((n+1)*(n+3))))
+sktests1<-sktests2<-numeric(m)
+for(i in 1:m){
+  x1<-rbeta(n,alpha,alpha)
+  x2<-rt(n,df=2)
+  sktests1[i]<-as.integer(abs(sk(x1)>=cv))
+  sktests2[i]<-as.integer(abs(sk(x2)>=cv))
+}
+pwj1<-mean(sktests1)
+pwj2<-mean(sktests2)
+print(c(pwj1,pwj2))
+
+```
+For beta distribution the power is very small.But for heavy-tailed distribution it's very big.
+
+---  
+
+## Question 6.A  
+
+Use Monte Carlo simulation to investigate whether the empirical Type I error rate of the t-test is approximately equal to the nominal significance level
+$\alpha$, when the sampled population is non-normal. The t-test is robust to mild departures from normality. Discuss the simulation results for the cases where the sampled population is (i) $\chi^2$(1), (ii) Uniform(0,2), and (iii) Exponential(rate=1). In each case, test H0 : $\mu$ = $\mu_0$ vs H0 : $\mu \neq \mu_0$, where $\mu_0$ is the mean of $\chi^2$(1), Uniform(0,2), and Exponential(1),respectively.  
+
+---  
+
+## Answer  
+
+```{r}
+n<-20
+alpha=0.05
+mu0<-1#these three distribution have the same mean
+
+m<-10000
+p1<-p2<-p3<-numeric(m)
+for(j in 1:m){
+  x1<-rchisq(n,df=1)##X~chisq(1)
+  ttest1<-t.test(x1,alternative="two.sided",mu=mu0)
+  p1[j]<-ttest1$p.value
+  x2<-runif(n,min=0,max=2)##X~U(0,2)
+  ttest2<-t.test(x2,alternative="two.sided",mu=mu0)
+  p2[j]<-ttest2$p.value
+  x3<-rexp(n,rate=1)##X~exp(1)
+  ttest3<-t.test(x3,alternative="two.sided",mu=mu0)
+  p3[j]<-ttest3$p.value
+}
+p1.hat<-mean(p1<alpha)
+p2.hat<-mean(p2<alpha)
+p3.hat<-mean(p3<alpha)
+print(c(p1.hat,p2.hat,p3.hat))
+```  
+For the sample (i) and (iii), type I error > $\alpha$.  
+For the sample (ii),type I error is very close to $\alpha$.  
+In fact if we choose a bigger n (for example, 200),then both these three numbers will be very close to $\alpha$.
+
+---  
+
+## Question on slides  
+
+![](C:\Users\Administrator\Pictures\5.png)  
+
+---  
+
+## Answer  
+
+(1)  
+  The hypothesis test problem is whether the powers are the same, in other words, whether the True Negative Rates are the same, which have the hypothesis as:  
+$H_0$: They have the same power. And $H_a$: They have different powers.  
+
+(2)  
+  We should use the McNemar test, it's a test usually used in paired four-cell table.  
+
+(3)  
+  We need to know the number of the experiments which are reject $H_0^{'}$ in fact,we note the number as n. And we need to know one of the a,b,c,d which are shown in the table. Here $H_0^{'}$ is the null hypothesis of the hypothesis problem which has 10000 experiments as the question described. Then for these experiments, it will be positive (accept $H_0^{'}$) or negative (reject $H_0^{'}$) in two methods. As we know power1 and power2,then we can get a complete paired four-cell table (by calculations) which includes four numbers: the number of experiments be postive in both methods,the number of experiments be postive in method 1 but be negative in method 2,the number of experiments be postive in method 2 but be negative in method 1 and the  number of experiments be negative in both methods.Then we can use McNemar test to this table.  
+
+
+The paired four-cell table is a table like this:  
+
+![](C:\Users\Administrator\Pictures\7.png)  
+
+

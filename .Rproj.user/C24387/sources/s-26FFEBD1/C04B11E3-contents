@@ -1,0 +1,102 @@
+---
+title: "Homework-11.15"
+author: "By 19087"
+date: "2019/11/16"
+output: html_document
+---
+
+## Question 7.8  
+
+Refer to Exercise 7.7. Obtain the jackknife estimates of bias and standard
+error of $\hat{\theta}$.  
+
+---  
+
+## Answer  
+
+
+```{r}
+library(bootstrap)
+n<-nrow(scor)
+lambda_hat <- eigen(cov(scor))$values
+theta_hat <- lambda_hat[1] / sum(lambda_hat)
+theta_j <- rep(0,n)
+for (i in 1:n) {
+x<-scor [-i,]
+lambda<-eigen(cov(x))$values
+theta_j[i]<-lambda[1]/sum(lambda)
+}
+bias_jack<-(n-1)*(mean(theta_j)-theta_hat)
+# the estimated bias of theta_hat
+se_jack<-(n-1)*sqrt(var(theta_j)/n)
+# the estimated se of theta_hat
+print(c(bias_jack,se_jack))
+```  
+
+---  
+
+## Question 7.10  
+
+In Example 7.18, leave-one-out (n-fold) cross validation was used to select the best fitting model. Repeat the analysis replacing the Log-Log model with a cubic polynomial model. Which of the four models is selected by the cross validation procedure? Which model is selected according to maximum adjusted $R^2$?  
+
+---  
+
+## Answer  
+
+By the cross validation procedure:
+
+```{r}
+library(DAAG)
+attach(ironslag)
+n<-length(magnetic)
+e1<-e2<-e3<-e4<-numeric(n)
+for(k in 1:n){
+  y<-magnetic[-k]
+  x<-chemical[-k]
+  
+  L1<-lm(y~x)
+  yhat1<-L1$coef[1]+L1$coef[2]*chemical[k]
+  e1[k]<-magnetic[k]-yhat1
+  
+  L2<-lm(y~x+I(x^2))
+  yhat2<-L2$coef[1]+L2$coef[2]*chemical[k]+L2$coef[3]*chemical[k]^2
+  e2[k]<-magnetic[k]-yhat2
+  
+  L3<-lm(log(y)~x)
+  logyhat3<-L3$coef[1]+L3$coef[2]*chemical[k]
+  yhat3<-exp(logyhat3)
+  e3[k]<-magnetic[k]-yhat3
+  
+  L4<-lm(y~x+I(x^2)+I(x^3))
+  yhat4<-L4$coef[1]+L4$coef[2]*chemical[k]+L4$coef[3]*chemical[k]^2+L4$coef[4]*chemical[k]^3
+  e4[k]<-magnetic[k]-yhat4
+  
+}
+c(mean(e1^2),mean(e2^2),mean(e3^2),mean(e4^2))
+```  
+
+So we choose the Model 2 by the cross validation procedure.  
+The model is:  
+
+```{r}
+LM2<-lm(magnetic~chemical+I(chemical^2))
+cat("Y=",LM2$coef[1],LM2$coef[2],"X","+",LM2$coef[3],"X^2")
+```  
+
+By maximum adjusted $R^2$:  
+
+```{r}
+
+LM1<-lm(magnetic~chemical)
+LM2<-lm(magnetic~chemical+I(chemical^2))
+LM3<-lm(log(magnetic)~chemical)
+LM4<-lm(magnetic~chemical+I(chemical^2)+I(chemical^3))
+c(summary(LM1)$adj.r.squared,summary(LM2)$adj.r.squared,summary(LM3)$adj.r.squared,summary(LM4)$adj.r.squared)
+```  
+
+So we choose the Model 2 by maximum adjusted $R^2$.  
+The model is:  
+```{r}
+
+cat("Y=",LM2$coef[1],LM2$coef[2],"X","+",LM2$coef[3],"X^2")
+```  

@@ -1,0 +1,48 @@
+---
+title: "Homework-2018.09.20"
+author: "By 19087"
+date: "2019/9/24"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+##Question
+
+Go through R for Beginners if you are not familiar with Rprogramming.
+
+Use knitr to produce at least 3 examples (texts, figures,tables).
+
+----
+
+
+##Example 1
+
+```{r}
+data<-rnorm(100,mean=0,sd=1)
+shapiro.test(data)
+```
+The p-value is `r shapiro.test(data)$p`.
+
+----
+
+##Example 2
+
+
+```{r}
+library(vcd)
+knitr::kable(head(Arthritis))
+```
+
+
+----
+
+##Example 3
+
+```{r}
+qqnorm(data)
+```
+
+
+
+
