@@ -3,4 +3,4 @@
 export(peBS)
 export(rBS)
 export(rwMC)
-importFrom(Rcpp,evalCpp)
+useDynLib(SC19087)

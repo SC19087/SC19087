@@ -8,7 +8,6 @@
 #' @param n sample size
 #' @return x a random sample of size \code{n} 
 #' @return k the number of iterations
-#' @useDynLib SC19087
 #' @examples
 #' \dontrun{
 #' x0<-25

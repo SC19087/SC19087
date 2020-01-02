@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
-
+useDynLib SC19083
   
 //' @title Random walk Metropolis sampler using Rcpp.
 //' @description Implement a random walk Metropolis sampler for generating the standard Laplace distribution
@@ -9,7 +9,6 @@ using namespace Rcpp;
 //' @param n sample size
 //' @return x a random sample of size \code{n} 
 //' @return k the number of iterations
-//' @useDynLib SC19087
 //' @examples
 //' \dontrun{
 //' x0<-25
