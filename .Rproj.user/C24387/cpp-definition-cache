@@ -1,17 +1,2 @@
 [
-    {
-        "definitions" : [
-            {
-                "column" : 8,
-                "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/rnormc.cpp",
-                "kind" : 6,
-                "line" : 18,
-                "name" : "rnormc(double, double)",
-                "parent_name" : "",
-                "usr" : "c:@F@rnormc#d#d#"
-            }
-        ],
-        "file" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/src/rnormc.cpp",
-        "file_last_write" : 1577773607
-    }
 ]

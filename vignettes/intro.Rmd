@@ -13,6 +13,43 @@ vignette: >
 
 __SC19087__ is a simple R package developed to write two functions and record the homework. Two functions are peBS, which is used to estimate BS density, and rBS, which is used to generate random sample from BS destiny. 
 
+---  
+
+The code of peBS is as follows:  
+```{r}
+peBS <- function(x, y, h){ # probability estimator of BS density
+
+  m <- length(x)
+  n <- length(y)
+  ye <- rep(0, m)
+  for (i in 1:n){
+    ye <- ye + as.numeric((x >= y[i] - h) & (x < y[i] + h))
+  }
+  ye <- ye / (2*h*n)
+  return(ye)
+}
+```
+We can use this to estimate BS density at x with bandwidth h and sample y.  
+
+The code of rBS is as follows:  
+```{r}
+rBS <- function(n){ 
+  u <- runif(n)
+  y <- u
+  ind <- which(u > 0.5) #index for those generated from N(0,1)
+  y[ind] <- rnorm(length(ind), 0, 1)
+  for (j in 0:4) {
+    ind <- which(u > j * 0.1 & u <= (j+1) * 0.1)
+    #index for those generated from N(j/2-1,1/10^2)
+    y[ind] <- rnorm(length(ind), j/2 -1, 1/10)
+  }
+  return(y)
+}
+```  
+
+We can use this to generate random sample of size n from BS destiny.  
+
+
 The rest is my homework.
 
 ---  

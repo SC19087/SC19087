@@ -1,4 +1,31 @@
 ## -----------------------------------------------------------------------------
+peBS <- function(x, y, h){ # probability estimator of BS density
+
+  m <- length(x)
+  n <- length(y)
+  ye <- rep(0, m)
+  for (i in 1:n){
+    ye <- ye + as.numeric((x >= y[i] - h) & (x < y[i] + h))
+  }
+  ye <- ye / (2*h*n)
+  return(ye)
+}
+
+## -----------------------------------------------------------------------------
+rBS <- function(n){ 
+  u <- runif(n)
+  y <- u
+  ind <- which(u > 0.5) #index for those generated from N(0,1)
+  y[ind] <- rnorm(length(ind), 0, 1)
+  for (j in 0:4) {
+    ind <- which(u > j * 0.1 & u <= (j+1) * 0.1)
+    #index for those generated from N(j/2-1,1/10^2)
+    y[ind] <- rnorm(length(ind), j/2 -1, 1/10)
+  }
+  return(y)
+}
+
+## -----------------------------------------------------------------------------
 data<-rnorm(100,mean=0,sd=1)
 shapiro.test(data)
 

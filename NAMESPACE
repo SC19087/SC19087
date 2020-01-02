@@ -2,3 +2,4 @@
 
 export(peBS)
 export(rBS)
+export(rwMC)

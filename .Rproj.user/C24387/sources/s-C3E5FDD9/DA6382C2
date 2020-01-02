@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3749201214",
+    "hash" : "130405962",
     "id" : "DA6382C2",
-    "lastKnownWriteTime" : 1577780965,
-    "last_content_update" : 1577780965526,
+    "lastKnownWriteTime" : 1577940544,
+    "last_content_update" : 1577940544704,
     "path" : "C:/Users/Administrator/Desktop/Rpackage/SC19087/vignettes/intro.Rmd",
     "project_path" : "vignettes/intro.Rmd",
     "properties" : {
-        "cursorPosition" : "16,0",
+        "cursorPosition" : "14,0",
         "scrollLine" : "0"
     },
     "relative_order" : 1,
