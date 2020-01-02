@@ -3,4 +3,7 @@
 export(peBS)
 export(rBS)
 export(rwMC)
+importFrom(Rcpp,evalCpp)
+importFrom(stats,rnorm)
+importFrom(stats,runif)
 useDynLib(SC19087)

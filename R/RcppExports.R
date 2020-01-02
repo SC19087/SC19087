@@ -8,6 +8,8 @@
 #' @param n sample size
 #' @return x a random sample of size \code{n} 
 #' @return k the number of iterations
+#' @importFrom Rcpp evalCpp
+#' @importFrom stats rnorm runif
 #' @useDynLib SC19087
 #' @examples
 #' \dontrun{
